@@ -1,9 +1,4 @@
 # Robby the Robot Q-learning Simulator
-# --------------------------------------
-# This program simulates a reinforcement learning agent (Robby)
-# using Q-learning to pick up soda cans in a 10x10 grid world.
-# Each episode Robby is placed randomly and must maximize his
-# reward by picking up cans while avoiding walls and mistakes.
 
 import numpy as np
 import random
@@ -11,14 +6,14 @@ import matplotlib.pyplot as plt
 import sys
 
 # Constants
-GRID_SIZE = 10                 # 10x10 interior grid
-EPISODES = 5000              # Number of training episodes
-STEPS = 200        # Steps per episode
-ALPHA = 0.2                    # Learning rate
-GAMMA = 0.9                    # Discount factor
-EPSILON_START = 0.1            # Initial exploration rate
-EPSILON_DECAY = 0.001          # Epsilon decay amount
-EPSILON_DECAY_INTERVAL = 50    # Decay frequency in episodes
+GRID_SIZE = 10                  # 10x10 interior grid
+N = 5000                        # Number of training episodes
+M = 200                         # Steps per episode
+n = 0.2                         # Learning rate
+y = 0.9                         # Discount factor
+EPSILON_START = 0.1             # Initial exploration rate
+EPSILON_DECAY = 0.001           # Epsilon decay amount
+EPSILON_DECAY_INTERVAL = 50     # Decay frequency in episodes
 
 # Rewards
 REWARD_CAN = +10
@@ -144,20 +139,20 @@ def train_and_test():
     plotted_eps, plotted_rewards = [], []
 
     # Training loop
-    for ep in range(1, EPISODES + 1):
+    for ep in range(1, N + 1):
         state = env.reset()
         total_reward = 0
 
         if ep % EPSILON_DECAY_INTERVAL == 0:
             epsilon = max(0.0, epsilon - EPSILON_DECAY)
 
-        for _ in range(STEPS):
+        for _ in range(M):
             if random.random() < epsilon:
                 action = random.randint(0, NUM_ACTIONS - 1)
             else:
                 action = np.argmax(Q[state])
             next_state, reward, _ = env.step(action)
-            Q[state, action] += ALPHA * (reward + GAMMA * np.max(Q[next_state]) - Q[state, action])
+            Q[state, action] += n * (reward + y * np.max(Q[next_state]) - Q[state, action])
             state = next_state
             total_reward += reward
 
@@ -170,10 +165,10 @@ def train_and_test():
 
     # Testing phase
     test_rewards = []
-    for ep in range(1, EPISODES + 1):
+    for ep in range(1, N + 1):
         state = env.reset()
         total_reward = 0
-        for _ in range(STEPS):
+        for _ in range(M):
             action = np.argmax(Q[state])
             state, reward, _ = env.step(action)
             total_reward += reward
